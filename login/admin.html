@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -39,11 +39,13 @@
   </section>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/supabase-client.js"></script>
 <script src="../js/common.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('adminLoginForm');
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('adminEmail').value.trim();
     const password = document.getElementById('adminPassword').value.trim();
@@ -53,13 +55,21 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    if(email === 'admin@youthuae.ae' && password === 'admin123'){
-      setCurrentUser({ email, role: 'admin' });
-      toast('Logged in as admin.');
-      setTimeout(() => window.location.href = '../admin.html', 500);
-    } else {
+    const { error } = await loginAdmin(email, password);
+    if(error){
       toast('Invalid credentials.');
+      return;
     }
+
+    const user = await getCurrentUser();
+    if(!user || user.role !== 'admin'){
+      toast('That account is not an admin.');
+      await clearCurrentUser();
+      return;
+    }
+
+    toast('Logged in as admin.');
+    setTimeout(() => window.location.href = '../admin.html', 500);
   });
 });
 </script>
