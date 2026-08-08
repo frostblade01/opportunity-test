@@ -1,7 +1,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   const id = qs('id');
-  const opp = getOpportunities().find(o => o.id === id);
+  const opp = id ? await getOpportunity(id) : null;
 
   const heroImg = opp && opp.image ? `<img src="${escapeHtml(opp.image)}" alt="${escapeHtml(opp.title)}" style="width:100%; height:100%; object-fit:cover;">` : phBlock((opp ? opp.type : 'Opportunity') + ' banner image');
   document.getElementById('detailHero').innerHTML = heroImg;
