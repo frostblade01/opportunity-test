@@ -1,9 +1,9 @@
-﻿
+
 
 let adminView = 'pending';
 
-document.addEventListener('DOMContentLoaded', () => {
-  const user = requireAdmin();
+document.addEventListener('DOMContentLoaded', async () => {
+  const user = await requireAdmin();
   if(!user) return;
 
   bindAdminTabs();
@@ -23,8 +23,8 @@ function bindAdminTabs(){
   });
 }
 
-function renderAdminList(){
-  const opps = getOpportunities();
+async function renderAdminList(){
+  const opps = await getOpportunities();
   const pending = opps.filter(o => o.status === 'pending');
   const live = opps.filter(o => o.status === 'approved');
 
@@ -65,29 +65,30 @@ function renderAdminList(){
     </div>`).join('');
 
   listEl.querySelectorAll('[data-action]').forEach(btn => {
-    btn.addEventListener('click', () => handleAction(btn.dataset.action, btn.dataset.id));
+    btn.addEventListener('click', () => handleAction(btn.dataset.action, btn.dataset.id, opps));
   });
 }
 
-function handleAction(action, id){
-  const opps = getOpportunities();
-  const idx = opps.findIndex(o => o.id === id);
-  if(idx === -1) return;
+async function handleAction(action, id, opps){
+  const opp = opps.find(o => o.id === id);
+  if(!opp) return;
 
   if(action === 'approve'){
-    opps[idx].status = 'approved';
+    const updated = await updateOpportunity(id, { status: 'approved' });
+    if(!updated) return;
     toast('Approved — now live on the student dashboard.');
   } else if(action === 'reject'){
-    opps.splice(idx, 1);
+    const ok = await deleteOpportunity(id);
+    if(!ok) return;
     toast('Submission rejected.');
   } else if(action === 'unpublish'){
-    opps.splice(idx, 1);
+    const ok = await deleteOpportunity(id);
+    if(!ok) return;
     toast('Opportunity removed from the live dashboard.');
   } else if(action === 'edit'){
-    openEditModal(opps[idx]);
+    openEditModal(opp);
     return;
   }
-  saveOpportunities(opps);
   renderAdminList();
 }
 
@@ -101,16 +102,15 @@ function bindPublishModal(){
   document.getElementById('cancelPublish').addEventListener('click', close);
   overlay.addEventListener('click', (e) => { if(e.target === overlay) close(); });
 
-  document.getElementById('confirmPublish').addEventListener('click', () => {
+  document.getElementById('confirmPublish').addEventListener('click', async () => {
     const title = document.getElementById('p-title').value.trim();
     const summary = document.getElementById('p-summary').value.trim();
     if(!title || !summary){
       toast('Please add at least a title and summary.');
       return;
     }
-    const opps = getOpportunities();
-    opps.push({
-      id: 'opp-' + Date.now(),
+    const deadline = document.getElementById('p-deadline').value;
+    const created = await addOpportunity({
       title,
       type: document.getElementById('p-type').value,
       subject: '',
@@ -118,14 +118,15 @@ function bindPublishModal(){
       audience: document.getElementById('p-audience').value,
       format: document.getElementById('p-format').value,
       emirate: document.getElementById('p-emirate').value.trim(),
-      deadline: document.getElementById('p-deadline').value,
+      deadline: deadline || null,
       summary,
       description: document.getElementById('p-description').value.trim() || summary,
       image: document.getElementById('p-image').value.trim(),
       link: document.getElementById('p-link').value.trim(),
       status: 'approved'
     });
-    saveOpportunities(opps);
+    if(!created) return;
+
     document.getElementById('publishForm').reset();
     close();
     adminView = 'live';
@@ -143,7 +144,7 @@ function bindEditModal(){
   document.getElementById('cancelEdit').addEventListener('click', close);
   overlay.addEventListener('click', (e) => { if(e.target === overlay) close(); });
 
-  document.getElementById('confirmEdit').addEventListener('click', () => {
+  document.getElementById('confirmEdit').addEventListener('click', async () => {
     const id = document.getElementById('edit-id').value;
     const title = document.getElementById('e-title').value.trim();
     const summary = document.getElementById('e-summary').value.trim();
@@ -152,27 +153,22 @@ function bindEditModal(){
       return;
     }
 
-    const opps = getOpportunities();
-    const idx = opps.findIndex(o => o.id === id);
-    if(idx === -1) return;
-
-    opps[idx] = {
-      ...opps[idx],
+    const deadline = document.getElementById('e-deadline').value;
+    const updated = await updateOpportunity(id, {
       title,
       type: document.getElementById('e-type').value,
-      subject: opps[idx].subject || '',
       price: document.getElementById('e-price').value,
       audience: document.getElementById('e-audience').value,
       format: document.getElementById('e-format').value,
       emirate: document.getElementById('e-emirate').value.trim(),
-      deadline: document.getElementById('e-deadline').value,
+      deadline: deadline || null,
       summary,
       description: document.getElementById('e-description').value.trim() || summary,
       image: document.getElementById('e-image').value.trim(),
       link: document.getElementById('e-link').value.trim()
-    };
+    });
+    if(!updated) return;
 
-    saveOpportunities(opps);
     document.getElementById('editForm').reset();
     close();
     renderAdminList();
@@ -189,11 +185,10 @@ function openEditModal(opp){
   document.getElementById('e-price').value = opp.price;
   document.getElementById('e-audience').value = opp.audience;
   document.getElementById('e-format').value = opp.format;
-  document.getElementById('e-deadline').value = opp.deadline;
+  document.getElementById('e-deadline').value = opp.deadline || '';
   document.getElementById('e-summary').value = opp.summary;
   document.getElementById('e-description').value = opp.description || '';
   document.getElementById('e-image').value = opp.image || '';
   document.getElementById('e-link').value = opp.link || '';
   overlay.classList.add('open');
 }
-
