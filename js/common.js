@@ -1,115 +1,124 @@
-﻿
-const STORAGE_KEYS = {
-  USER: 'uoh_current_user',
-  USERS: 'uoh_users',
-  OPPS: 'uoh_opportunities',
-  BOOKMARKS: 'uoh_bookmarks'
-};
 
-const ADMIN_EMAIL = 'admin@youthuae.ae';
-
-const SEED_OPPORTUNITIES = [
-  {
-    id: 'opp-1',
-    title: 'Dubai Youth Model United Nations',
-    type: 'MUN',
-    subject: 'Diplomacy & Policy',
-    price: 'Paid',
-    audience: 'High School',
-    format: 'Offline',
-    emirate: 'Dubai',
-    deadline: '2026-09-12',
-    summary: 'A three-day conference for high schoolers to debate global issues as delegates from UN member states.',
-    description: 'Delegates represent assigned countries across committees covering climate policy, trade, and human rights. Includes delegate training, a keynote from a former diplomat, and a closing gala. Open to first-time and experienced MUN delegates alike — position papers are workshopped in advance.',
-    link: 'https://example.com/dubai-mun',
-    status: 'approved'
-  },
-  {
-    id: 'opp-2',
-    title: 'ADNOC Summer Engineering Internship',
-    type: 'Internship',
-    subject: 'Engineering',
-    price: 'Free',
-    audience: 'University',
-    format: 'Offline',
-    emirate: 'Abu Dhabi',
-    deadline: '2026-08-30',
-    summary: 'Four-week paid-style placement shadowing engineers across upstream and downstream operations.',
-    description: 'Selected students rotate through process, mechanical, and digital engineering teams, working on real efficiency projects with a mentor. The internship closes with a presentation to a panel of senior engineers and a certificate of completion.',
-    link: 'https://example.com/adnoc-internship',
-    status: 'approved'
-  },
-  {
-    id: 'opp-3',
-    title: 'Sharjah Beach Cleanup Corps',
-    type: 'Volunteering',
-    subject: 'Environment',
-    price: 'Free',
-    audience: 'All Levels',
-    format: 'Offline',
-    emirate: 'Sharjah',
-    deadline: '2026-08-15',
-    summary: 'Weekly coastal cleanup drives with a marine conservation NGO — logged volunteering hours provided.',
-    description: 'Volunteers join guided cleanups along the Sharjah coastline, learn basic marine ecology from resident biologists, and help catalogue waste data used in regional reports. Certificates and verified volunteering hours are issued each term.',
-    link: 'https://example.com/sharjah-cleanup',
-    status: 'approved'
-  },
-  {
-    id: 'opp-4',
-    title: 'RAK Hackathon: Build for the Desert',
-    type: 'Hackathon',
-    subject: 'Technology',
-    price: 'Free',
-    audience: 'High School',
-    format: 'Hybrid',
-    emirate: 'Ras Al Khaimah',
-    deadline: '2026-10-02',
-    summary: '48-hour student hackathon building tech solutions for water scarcity and desert agriculture.',
-    description: 'Teams of up to four prototype hardware or software solutions with mentorship from local startups. Remote participation is supported for the ideation phase, with the final build weekend held in person. Prizes include incubation slots with a Ras Al Khaimah accelerator.',
-    link: 'https://example.com/rak-hackathon',
-    status: 'approved'
-  },
-  {
-    id: 'opp-5',
-    title: 'Abu Dhabi Coding Bootcamp — AI Track',
-    type: 'Bootcamp',
-    subject: 'Technology',
-    price: 'Paid',
-    audience: 'University',
-    format: 'Online',
-    emirate: 'Abu Dhabi',
-    deadline: '2026-09-28',
-    summary: 'Two-week intensive covering Python, machine learning basics, and a capstone AI project.',
-    description: 'Daily live sessions taught by industry practitioners, paired with asynchronous labs. Students finish with a working ML model and a portfolio-ready writeup. A limited number of need-based scholarships are available on request.',
-    link: 'https://example.com/ad-bootcamp',
-    status: 'approved'
+//data
+async function getOpportunities(){
+  const { data, error } = await sb
+    .from('opportunities')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if(error){
+    console.error(error);
+    toast('Could not load opportunities from Supabase.');
+    return [];
   }
-];
-
-function initStorage(){
-  if(!localStorage.getItem(STORAGE_KEYS.OPPS)){
-    localStorage.setItem(STORAGE_KEYS.OPPS, JSON.stringify(SEED_OPPORTUNITIES));
-  }
-  if(!localStorage.getItem(STORAGE_KEYS.USERS)){
-    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify([]));
-  }
-  if(!localStorage.getItem(STORAGE_KEYS.BOOKMARKS)){
-    localStorage.setItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify([]));
-  }
+  return data;
 }
-function getOpportunities(){ return JSON.parse(localStorage.getItem(STORAGE_KEYS.OPPS) || '[]'); }
-function saveOpportunities(list){ localStorage.setItem(STORAGE_KEYS.OPPS, JSON.stringify(list)); }
-function getCurrentUser(){ return JSON.parse(localStorage.getItem(STORAGE_KEYS.USER) || 'null'); }
-function setCurrentUser(u){ localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(u)); }
-function clearCurrentUser(){ localStorage.removeItem(STORAGE_KEYS.USER); }
-function getBookmarks(){ return JSON.parse(localStorage.getItem(STORAGE_KEYS.BOOKMARKS) || '[]'); }
-function saveBookmarks(list){ localStorage.setItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify(list)); }
-function toggleBookmark(id){
-  let marks = getBookmarks();
-  marks = marks.includes(id) ? marks.filter(m => m !== id) : [...marks, id];
-  saveBookmarks(marks);
-  return marks.includes(id);
+
+async function getOpportunity(id){
+  const { data, error } = await sb
+    .from('opportunities')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+  if(error){
+    console.error(error);
+    return null;
+  }
+  return data;
 }
+
+async function addOpportunity(opp){
+  const { data, error } = await sb
+    .from('opportunities')
+    .insert(opp)
+    .select()
+    .single();
+  if(error){
+    console.error(error);
+    toast('Could not save that — please try again.');
+    return null;
+  }
+  return data;
+}
+
+async function updateOpportunity(id, fields){
+  const { data, error } = await sb
+    .from('opportunities')
+    .update(fields)
+    .eq('id', id)
+    .select()
+    .single();
+  if(error){
+    console.error(error);
+    toast('Could not save changes.');
+    return null;
+  }
+  return data;
+}
+
+async function deleteOpportunity(id){
+  const { error } = await sb
+    .from('opportunities')
+    .delete()
+    .eq('id', id);
+  if(error){
+    console.error(error);
+    toast('Could not complete that action.');
+    return false;
+  }
+  return true;
+}
+
+//auth
+
+async function getCurrentUser(){
+  const { data: { session } } = await sb.auth.getSession();
+  if(!session) return null;
+
+  const { data: profile, error } = await sb
+    .from('profiles')
+    .select('role')
+    .eq('id', session.user.id)
+    .maybeSingle();
+  if(error) console.error(error);
+
+  return {
+    id: session.user.id,
+    email: session.user.email,
+    role: profile ? profile.role : 'user'
+  };
+}
+
+async function loginAdmin(email, password){
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if(error) return { error };
+  return { data };
+}
+
+async function clearCurrentUser(){
+  await sb.auth.signOut();
+}
+
+async function requireAuth(){
+  const user = await getCurrentUser();
+  if(!user){
+    sessionStorage.setItem('uoh_toast_next', 'Please log in to view opportunities.');
+    window.location.href = 'login/admin.html';
+    return null;
+  }
+  return user;
+}
+
+async function requireAdmin(){
+  const user = await getCurrentUser();
+  if(!user || user.role !== 'admin'){
+    sessionStorage.setItem('uoh_toast_next', 'That area is restricted to admin accounts.');
+    window.location.href = user ? 'dashboard.html' : 'login/admin.html';
+    return null;
+  }
+  return user;
+}
+
+//util
 
 function escapeHtml(str){
   return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -125,7 +134,6 @@ function qs(name){
 }
 
 function phBlock(label){
-
   return `<div class="ph ph-empty"></div>`;
 }
 
@@ -150,10 +158,11 @@ function currentPage(){
   const p = window.location.pathname.split('/').pop() || 'index.html';
   return p;
 }
-function renderNav(){
+
+async function renderNav(){
   const mount = document.getElementById('site-nav');
   if(!mount) return;
-  const user = getCurrentUser();
+  const user = await getCurrentUser();
   const page = currentPage();
   const link = (href, label) => `<a href="${href}" class="${page === href ? 'active' : ''}">${label}</a>`;
 
@@ -182,8 +191,8 @@ function renderNav(){
 
   const logoutBtn = document.getElementById('logoutBtn');
   if(logoutBtn){
-    logoutBtn.addEventListener('click', () => {
-      clearCurrentUser();
+    logoutBtn.addEventListener('click', async () => {
+      await clearCurrentUser();
       toast('Logged out.');
       setTimeout(() => window.location.href = 'index.html', 500);
     });
@@ -208,24 +217,6 @@ function renderFooter(){
     </div>`;
 }
 
-function requireAuth(){
-  const user = getCurrentUser();
-  if(!user){
-    sessionStorage.setItem('uoh_toast_next', 'Please log in to view opportunities.');
-    window.location.href = 'login.html';
-    return null;
-  }
-  return user;
-}
-function requireAdmin(){
-  const user = getCurrentUser();
-  if(!user || user.role !== 'admin'){
-    sessionStorage.setItem('uoh_toast_next', 'That area is restricted to admin accounts.');
-    window.location.href = user ? 'dashboard.html' : 'login/admin.html';
-    return null;
-  }
-  return user;
-}
 function flushQueuedToast(){
   const msg = sessionStorage.getItem('uoh_toast_next');
   if(msg){
@@ -234,13 +225,11 @@ function flushQueuedToast(){
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  initStorage();
+document.addEventListener('DOMContentLoaded', async () => {
   const g = document.createElement('div');
   g.className = 'grain';
   document.body.appendChild(g);
-  renderNav();
+  await renderNav();
   renderFooter();
   flushQueuedToast();
 });
-
