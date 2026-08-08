@@ -1,14 +1,17 @@
-﻿
+
 let currentView = 'all';
+let allOpportunities = [];
 const activeFilters = { search: '', type: '', emirate: '', price: '', audience: '', format: '' };
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initParallax();
-  buildTypeFilters();
-  buildEmirateFilter();
   bindFilterEvents();
   bindTabEvents();
   bindModal();
+
+  allOpportunities = await getOpportunities();
+  buildTypeFilters();
+  buildEmirateFilter();
   renderGrid();
 });
 
@@ -27,7 +30,7 @@ function initParallax(){
 }
 
 function buildTypeFilters(){
-  const types = [...new Set(getOpportunities().map(o => o.type))].sort();
+  const types = [...new Set(allOpportunities.map(o => o.type))].sort();
   const select = document.getElementById('typeFilter');
   types.forEach(t => {
     const opt = document.createElement('option');
@@ -36,7 +39,7 @@ function buildTypeFilters(){
   });
 }
 function buildEmirateFilter(){
-  const emirates = [...new Set(getOpportunities().map(o => o.emirate).filter(Boolean))].sort();
+  const emirates = [...new Set(allOpportunities.map(o => o.emirate).filter(Boolean))].sort();
   const select = document.getElementById('emirateFilter');
   emirates.forEach(em => {
     const opt = document.createElement('option');
@@ -97,7 +100,7 @@ function bindTabEvents(){
 }
 
 function getFilteredOpportunities(){
-  return getOpportunities().filter(o => {
+  return allOpportunities.filter(o => {
     if(o.status !== 'approved') return false;
     if(activeFilters.search && !o.title.toLowerCase().includes(activeFilters.search)) return false;
     if(activeFilters.type && o.type !== activeFilters.type) return false;
@@ -110,7 +113,7 @@ function getFilteredOpportunities(){
 }
 
 function renderGrid(){
-  const all = getOpportunities().filter(o => o.status === 'approved');
+  const all = allOpportunities.filter(o => o.status === 'approved');
   const filtered = getFilteredOpportunities();
 
   document.getElementById('countAll').textContent = all.length;
@@ -167,16 +170,15 @@ function bindModal(){
   document.getElementById('cancelSubmitModal').addEventListener('click', close);
   overlay.addEventListener('click', (e) => { if(e.target === overlay) close(); });
 
-  document.getElementById('confirmSubmitOpp').addEventListener('click', () => {
+  document.getElementById('confirmSubmitOpp').addEventListener('click', async () => {
     const title = document.getElementById('f-title').value.trim();
     const summary = document.getElementById('f-summary').value.trim();
     if(!title || !summary){
       toast('Please add at least a title and summary.');
       return;
     }
-    const opps = getOpportunities();
-    const newOpp = {
-      id: 'opp-' + Date.now(),
+    const deadline = document.getElementById('f-deadline').value;
+    const created = await addOpportunity({
       title,
       type: document.getElementById('f-type').value,
       subject: document.getElementById('f-subject').value.trim(),
@@ -184,18 +186,17 @@ function bindModal(){
       audience: document.getElementById('f-audience').value,
       format: document.getElementById('f-format').value,
       emirate: '',
-      deadline: document.getElementById('f-deadline').value,
+      deadline: deadline || null,
       summary,
       description: document.getElementById('f-description').value.trim() || summary,
       image: document.getElementById('f-image').value.trim(),
       link: document.getElementById('f-link').value.trim(),
       status: 'pending'
-    };
-    opps.push(newOpp);
-    saveOpportunities(opps);
+    });
+    if(!created) return;
+
     document.getElementById('submitOppForm').reset();
     close();
     toast('Submitted for review. An admin will approve it soon.');
   });
 }
-
