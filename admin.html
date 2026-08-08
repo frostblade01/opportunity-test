@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — UAE Opportunities Hub</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+<header id="site-nav" class="site-nav"></header>
+
+<main>
+  <section class="admin-head">
+    <div class="container">
+      <div>
+        <p class="eyebrow">Admin</p>
+        <h1 class="admin-title">Admin Dashboard</h1>
+        <p class="admin-sub">Review submissions and manage what's live on the student dashboard.</p>
+      </div>
+      <button class="btn btn-primary" id="publishBtn">＋ Add New Opportunity</button>
+    </div>
+  </section>
+
+  <section class="admin-body">
+    <div class="container">
+      <div class="view-tabs">
+        <button class="view-tab active" data-view="pending">Pending Review <span class="count" id="countPending">0</span></button>
+        <button class="view-tab" data-view="live">Live Opportunities <span class="count" id="countLive">0</span></button>
+      </div>
+
+      <div class="admin-list" id="adminList"></div>
+      <div class="empty-state hidden" id="adminEmpty">
+        <h4>Nothing Here Yet</h4>
+        <p id="adminEmptyText">No pending submissions at the moment.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer id="site-footer" class="site-footer"></footer>
+
+<div class="modal-overlay" id="publishModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 class="modal-title">Publish an Opportunity</h3>
+      <button class="modal-close" id="closePublishModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="publishForm" novalidate>
+        <div class="field"><label for="p-title">Title</label><input type="text" id="p-title" placeholder="e.g. Dubai Youth MUN"></div>
+        <div class="field-row">
+          <div class="field">
+            <label for="p-type">Type</label>
+            <select id="p-type">
+              <option>MUN</option><option>Internship</option><option>Volunteering</option>
+              <option>Summer Camp</option><option>Competition</option><option>Hackathon</option><option>Bootcamp</option><option>Workshop</option>
+            </select>
+          </div>
+          <div class="field"><label for="p-emirate">Emirate</label><input type="text" id="p-emirate" placeholder="e.g. Dubai"></div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="p-price">Price</label>
+            <select id="p-price"><option>Free</option><option>Paid</option></select>
+          </div>
+          <div class="field">
+            <label for="p-audience">Education Level</label>
+            <select id="p-audience"><option>Middle School</option><option>High School</option><option>University</option><option>All Levels</option></select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="p-format">Format</label>
+            <select id="p-format"><option>Online</option><option>Offline</option><option>Hybrid</option></select>
+          </div>
+          <div class="field"><label for="p-deadline">Deadline</label><input type="date" id="p-deadline"></div>
+        </div>
+        <div class="field"><label for="p-summary">Summary</label><textarea id="p-summary" style="min-height:64px;"></textarea></div>
+        <div class="field"><label for="p-description">Full Description</label><textarea id="p-description"></textarea></div>
+        <div class="field"><label for="p-image">Image URL</label><input type="text" id="p-image" placeholder="Optional — leave blank to use a placeholder"></div>
+        <div class="field"><label for="p-link">Registration Link</label><input type="text" id="p-link" placeholder="https://"></div>
+      </form>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost btn-sm" id="cancelPublish">Cancel</button>
+      <button class="btn btn-primary btn-sm" id="confirmPublish">Publish Live</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="editModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 class="modal-title">Edit Opportunity</h3>
+      <button class="modal-close" id="closeEditModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="editForm" novalidate>
+        <input type="hidden" id="edit-id">
+        <div class="field"><label for="e-title">Title</label><input type="text" id="e-title" placeholder="e.g. Dubai Youth MUN"></div>
+        <div class="field-row">
+          <div class="field">
+            <label for="e-type">Type</label>
+            <select id="e-type">
+              <option>MUN</option><option>Internship</option><option>Volunteering</option>
+              <option>Summer Camp</option><option>Competition</option><option>Hackathon</option><option>Bootcamp</option><option>Workshop</option>
+            </select>
+          </div>
+          <div class="field"><label for="e-emirate">Emirate</label><input type="text" id="e-emirate" placeholder="e.g. Dubai"></div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="e-price">Price</label>
+            <select id="e-price"><option>Free</option><option>Paid</option></select>
+          </div>
+          <div class="field">
+            <label for="e-audience">Education Level</label>
+            <select id="e-audience"><option>Middle School</option><option>High School</option><option>University</option><option>All Levels</option></select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="e-format">Format</label>
+            <select id="e-format"><option>Online</option><option>Offline</option><option>Hybrid</option></select>
+          </div>
+          <div class="field"><label for="e-deadline">Deadline</label><input type="date" id="e-deadline"></div>
+        </div>
+        <div class="field"><label for="e-summary">Summary</label><textarea id="e-summary" style="min-height:64px;"></textarea></div>
+        <div class="field"><label for="e-description">Full Description</label><textarea id="e-description"></textarea></div>
+        <div class="field"><label for="e-image">Image URL</label><input type="text" id="e-image" placeholder="Optional — leave blank to use a placeholder"></div>
+        <div class="field"><label for="e-link">Registration Link</label><input type="text" id="e-link" placeholder="https://"></div>
+      </form>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost btn-sm" id="cancelEdit">Cancel</button>
+      <button class="btn btn-primary btn-sm" id="confirmEdit">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/common.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
+

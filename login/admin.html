@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login — UAE Opportunities Hub</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .modern-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255,255,255,0.15);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+  }
+</style>
+</head>
+<body>
+
+<main>
+  <section class="section" style="min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+    <div class="container" style="max-width: 420px;">
+      <div class="modern-card" style="background: linear-gradient(145deg, #1c1c1f 0%, #151517 100%); border: 1px solid rgba(255,255,255,0.08); padding: 48px 40px; border-radius: 12px; transition:transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;">
+        <h1 style="font-family: var(--font-display); font-weight: 700; text-transform: uppercase; font-size: 28px; text-align: center; margin-bottom: 32px;">Admin Login</h1>
+        <form id="adminLoginForm" novalidate>
+          <div class="field" style="margin-bottom: 20px;">
+            <label for="adminEmail" style="display: block; margin-bottom: 8px; font-size: 14px; color: var(--ink-dim);">Email</label>
+            <input type="email" id="adminEmail" placeholder="admin@youthuae.ae" style="width: 100%; padding: 12px 16px; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 1px solid rgba(255,255,255,0.08); color: var(--ink); font-size: 15px; border-radius: 8px; transition:border-color 0.3s ease;">
+          </div>
+          <div class="field" style="margin-bottom: 24px;">
+            <label for="adminPassword" style="display: block; margin-bottom: 8px; font-size: 14px; color: var(--ink-dim);">Password</label>
+            <input type="password" id="adminPassword" placeholder="••••••••" style="width: 100%; padding: 12px 16px; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 1px solid rgba(255,255,255,0.08); color: var(--ink); font-size: 15px; border-radius: 8px; transition:border-color 0.3s ease;">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Login as Admin</button>
+        </form>
+        <div style="text-align: center; margin-top: 24px;">
+          <a href="../index.html" style="color: var(--ink-dim); font-size: 13px;">Go to Homepage</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="../js/common.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('adminLoginForm');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('adminEmail').value.trim();
+    const password = document.getElementById('adminPassword').value.trim();
+
+    if(!email || !password){
+      toast('Please enter both email and password.');
+      return;
+    }
+
+    if(email === 'admin@youthuae.ae' && password === 'admin123'){
+      setCurrentUser({ email, role: 'admin' });
+      toast('Logged in as admin.');
+      setTimeout(() => window.location.href = '../admin.html', 500);
+    } else {
+      toast('Invalid credentials.');
+    }
+  });
+});
+</script>
+</body>
+</html>
+

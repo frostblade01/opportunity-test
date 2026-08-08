@@ -1,0 +1,171 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Opportunities — UAE Opportunities Hub</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+<header id="site-nav" class="site-nav"></header>
+
+<main>
+
+  <section class="dash-hero" id="dashHero">
+    <div class="dash-hero-bg" id="dashHeroBg">
+      <img src="wp8140871.jpg" alt="Hero image" class="hero-image-preview" />
+    </div>
+    <div class="dash-hero-scrim"></div>
+    <div class="dash-hero-inner">
+      <div class="container">
+        <p class="eyebrow dash-eyebrow">Live board</p>
+        <h1 class="dash-title">Find What Moves You</h1>
+        <p class="dash-sub">Browse verified opportunities for UAE students — filter by type, price, audience and format.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="ticker-strip">
+    <div class="ticker-track">
+      <span><b>MUN</b> · Diplomacy</span><span><b>Internship</b> · Career</span><span><b>Hackathon</b> · Build</span><span><b>Volunteering</b> · Give back</span><span><b>Bootcamp</b> · Learn fast</span><span><b>Competition</b> · Compete</span>
+      <span><b>MUN</b> · Diplomacy</span><span><b>Internship</b> · Career</span><span><b>Hackathon</b> · Build</span><span><b>Volunteering</b> · Give back</span><span><b>Bootcamp</b> · Learn fast</span><span><b>Competition</b> · Compete</span>
+    </div>
+  </div>
+
+  <div class="dash-toolbar">
+    <div class="container">
+      <div class="view-tabs">
+        <button class="view-tab active" data-view="all">All Opportunities <span class="count" id="countAll">0</span></button>
+      </div>
+      <button class="btn btn-primary btn-sm" id="submitOppBtn">＋ Submit New Opportunity</button>
+    </div>
+  </div>
+
+  <div class="dash-layout">
+    <aside class="filters-col">
+      <div class="filters-head">
+        <h3>Filters</h3>
+        <button class="filter-reset" id="resetFiltersBtn">Reset</button>
+      </div>
+
+      <div class="filter-group filter-search">
+        <label class="filter-label" for="searchInput">Search by title</label>
+        <input type="text" id="searchInput" placeholder="e.g. Hackathon">
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">Type</span>
+        <select id="typeFilter">
+          <option value="">All Types</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">Emirate</span>
+        <select id="emirateFilter">
+          <option value="">All Emirates</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">Price</span>
+        <select id="priceFilter">
+          <option value="">All</option>
+          <option value="Free">Free</option>
+          <option value="Paid">Paid</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">Education Level</span>
+        <select id="audienceFilter">
+          <option value="">All Levels</option>
+          <option value="Middle School">Middle School</option>
+          <option value="High School">High School</option>
+          <option value="University">University</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">Format</span>
+        <select id="formatFilter">
+          <option value="">All</option>
+          <option value="Online">Online</option>
+          <option value="Offline">Offline</option>
+          <option value="Hybrid">Hybrid</option>
+        </select>
+      </div>
+    </aside>
+
+    <section class="results-col">
+      <div class="results-meta">
+        <span class="results-count" id="resultsCount">0 opportunities</span>
+      </div>
+      <div class="opp-grid" id="oppGrid"></div>
+      <div class="empty-state hidden" id="emptyState">
+        <h4>No Opportunities Found</h4>
+        <p>Try adjusting your filters, or be the first to submit one.</p>
+      </div>
+    </section>
+  </div>
+
+</main>
+
+<footer id="site-footer" class="site-footer"></footer>
+
+<div class="modal-overlay" id="submitModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 class="modal-title">Submit an Opportunity</h3>
+      <button class="modal-close" id="closeSubmitModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="submitOppForm" novalidate>
+        <div class="field"><label for="f-title">Title</label><input type="text" id="f-title" placeholder="e.g. Dubai Youth MUN"></div>
+        <div class="field-row">
+          <div class="field">
+            <label for="f-type">Type</label>
+            <select id="f-type">
+              <option>MUN</option><option>Internship</option><option>Volunteering</option>
+              <option>Summer Camp</option><option>Competition</option><option>Hackathon</option><option>Bootcamp</option><option>Workshop</option>
+            </select>
+          </div>
+          <div class="field"><label for="f-subject">Subject / Field</label><input type="text" id="f-subject" placeholder="e.g. Technology"></div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="f-price">Price</label>
+            <select id="f-price"><option>Free</option><option>Paid</option></select>
+          </div>
+          <div class="field">
+            <label for="f-audience">Education Level</label>
+            <select id="f-audience"><option>Middle School</option><option>High School</option><option>University</option><option>All Levels</option></select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="f-format">Format</label>
+            <select id="f-format"><option>Online</option><option>Offline</option><option>Hybrid</option></select>
+          </div>
+        </div>
+        <div class="field"><label for="f-deadline">Deadline</label><input type="date" id="f-deadline"></div>
+        <div class="field"><label for="f-summary">Summary</label><textarea id="f-summary" placeholder="One or two sentences for the card view" style="min-height:64px;"></textarea></div>
+        <div class="field"><label for="f-description">Full Description</label><textarea id="f-description" placeholder="Full details shown on the opportunity page"></textarea></div>
+        <div class="field"><label for="f-image">Image URL</label><input type="text" id="f-image" placeholder="Optional — leave blank to use a placeholder"></div>
+        <div class="field"><label for="f-link">Registration Link</label><input type="text" id="f-link" placeholder="https://"></div>
+      </form>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost btn-sm" id="cancelSubmitModal">Cancel</button>
+      <button class="btn btn-primary btn-sm" id="confirmSubmitOpp">Submit for Review</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/common.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>
+
