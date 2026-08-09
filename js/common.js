@@ -27,17 +27,15 @@ async function getOpportunity(id){
 }
 
 async function addOpportunity(opp){
-  const { data, error } = await sb
+  const { error } = await sb
     .from('opportunities')
-    .insert(opp)
-    .select()
-    .single();
+    .insert(opp);
   if(error){
     console.error(error);
     toast('Could not save that — please try again.');
     return null;
   }
-  return data;
+  return true;
 }
 
 async function updateOpportunity(id, fields){
