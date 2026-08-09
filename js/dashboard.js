@@ -194,6 +194,30 @@ function bindModal(){
       status: 'pending'
     });
     if(!created) return;
+    
+    const url = "aaronthefernandes@gmail.com";
+    
+   
+    const emailData = {
+        _subject: "New Opportunity Awaiting Review",
+        Message: `"${title}" : "${summary}"`
+    };
+
+
+    fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        body: JSON.stringify(emailData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success === "true") {
+            console.log("Review notification sent successfully.");
+        }
+    })
 
     document.getElementById('submitOppForm').reset();
     close();
