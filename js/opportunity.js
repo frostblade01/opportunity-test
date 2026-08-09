@@ -1,5 +1,5 @@
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const id = qs('id');
   const opp = id ? await getOpportunity(id) : null;
 
